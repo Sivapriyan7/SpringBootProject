@@ -1,35 +1,38 @@
 package com.sivapriyan.springproject.week1.introductionToSpringBoot.controllers;
 
 import com.sivapriyan.springproject.week1.introductionToSpringBoot.dto.EmployeeDTO;
+import com.sivapriyan.springproject.week1.introductionToSpringBoot.entities.EmployeeEntitiy;
+import com.sivapriyan.springproject.week1.introductionToSpringBoot.repositories.EmployeeRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/employees")
 public class EmployeeController {
 
-//    @GetMapping(path = "/getMessage")
-//    public String getMessageSpring(){
-//        return "Message Successfully got";
-//    }
+    private final EmployeeRepository employeeRepository;
+
+    public EmployeeController(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
+    }
 
     @GetMapping(path = "/{employeeId}")
-    public EmployeeDTO getEmployeeById(@PathVariable(name = "employeeId") Long employeeId){
-        return new EmployeeDTO(employeeId,"Siva","siva@gmail.com",21, LocalDate.of(2024,1,2), true);
+    public EmployeeEntitiy getEmployeeById(@PathVariable(name = "employeeId") Long id){
+        return employeeRepository.findById(id).orElse(null);
     }
 
     @GetMapping
-    public String getAllEmployees(@RequestParam(required = false) Integer age,
-                                  @RequestParam(required = false) String sortBy)
+    public List<EmployeeEntitiy> getAllEmployees(@RequestParam(required = false) Integer age,
+                                @RequestParam(required = false) String sortBy)
     {
-        return "Hi age"+age+" "+sortBy;
+        return employeeRepository.findAll();
     }
 
     @PostMapping
-    public EmployeeDTO createNewEmployee(@RequestBody EmployeeDTO inputEmployee){
-        inputEmployee.setId(100L);
-        return inputEmployee;
+    public EmployeeEntitiy createNewEmployee(@RequestBody EmployeeEntitiy inputEmployee){
+        return employeeRepository.save(inputEmployee);
     }
 
     @PutMapping
